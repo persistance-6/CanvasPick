@@ -10,7 +10,7 @@ contract ArtworkToken is ERC721, Ownable {
         string name;
         string artist;
         string location;
-        uint256 creationDate;
+        uint32 creationDate;
         uint256 pricePerPiece;
     }
 
@@ -24,7 +24,7 @@ contract ArtworkToken is ERC721, Ownable {
         string memory name,
         string memory artist,
         string memory location,
-        uint256 creationDate,
+        uint32 creationDate,
         uint256 pricePerPiece
     ) public onlyOwner returns (uint256) {
         require(bytes(name).length > 0, "Name is required");
