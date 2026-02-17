@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import CanvasPickAsset from './contracts/CanvasPickAsset.json';
 
 // Remix에서 배포 후 받은 컨트랙트 주소
-const CONTRACT_ADDRESS = "0x8C8da0dffb9764B966acAb2B99cBDEC560283BD7";
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 
 function App() {
   const [account, setAccount] = useState("");
