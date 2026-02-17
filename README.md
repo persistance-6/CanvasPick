@@ -1,31 +1,16 @@
-# CanvasPick
-2026.02.14 - 2026.
-My first dApp project using RWA(Real World Assets) to trade work of art.
-ERC-1155 형태로 민팅된 예술 작품을 10,000 조각으로 나누어 0.01% 단위로 소유할 수 있게 한다.
+# React + Vite
 
-## 배경
-비탈릭 부테린의 저서 《지분증명》을 통해 처음 접한 NFT는 단순한 기술적 개념을 넘어, 예술 생태계의 새로운 가능성으로 다가왔다.
-특히 블록체인을 활용한 유일성 증명과 투명한 거래 수수료 체계가 창작자들에게 **정당한 보상**을 실현하는 핵심 도구가 될 수 있다는 점에 깊은 감명을 받았다.
-본 프로젝트를 통해 책이나 경제 뉴스에서만 보던 NFT라는 개념을 기술적으로 이해하며,
-React와 스마트 컨트랙트를 결합하여 실질적인 가치 기반의 예술품 거래 시스템을 직접 구현해 보고자 한다.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 개발 환경
-Github Codespaces (React.js + Solidity + Base Sepolia Testnet)
+Currently, two official plugins are available:
 
-## 주요 기능들
-### 1. 작품 갤러리 및 상세 정보
-전체 작품 목록을 구경 및 검색한다.
-작품을 클릭하면 작품의 세부 정보를 볼 수 있다.
-세부 정보에는 '미술품의 고유 번호', '작가 정보', '실물 보관 장소', '1조각당 가격'이 포함된다.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-### 2. 구매 및 거래
-작품 세부 정보 페이지에서 구매 버튼을 누르면 연동된 Metamask 지갑으로 실제 거래가 진행된다.
-소유할 조각 개수를 선택하면 결제가와 예상 가스비가 화면에 표시된다.
-결제 버튼을 누르면 작품의 소유권이 이전되며, ether가 소진된다.
+## React Compiler
 
-### 3. 예술 작품 등록 (Minting)
-Pinata와 연동하여 새로운 ERC-1155 토큰을 민팅한다.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### 4. 내 자산 목록
-자신이 소유한 모든 자산 가치의 합과 지분 비율을 산출한다.
-각 작품당 몇 퍼센트를 소유하였는지 출력한다.
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
