@@ -39,6 +39,13 @@ function App() {
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CanvasPickAsset.abi, signer);
 
+      // [추가] 화이트리스트 체크 로직
+      const isWhite = await contract.whitelisted(account);
+      if (!isWhite) {
+        setStatus("오류: 화이트리스트에 등록되지 않은 지갑입니다.\n관리자에게 문의하세요.");
+        return; // 화이트리스트가 아니면 여기서 중단
+      }
+
       // 1. 가격 단위를 ETH에서 Wei로 변환
       const priceInWei = ethers.parseEther(price);
       
