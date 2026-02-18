@@ -80,48 +80,17 @@ function Home({ onArtworkSelect }) {
   };
 
   return (
-    <div className="pt-20 min-h-screen bg-slate-50 flex flex-col p-6">
-      <div className="max-w-md mx-auto my-auto w-full rounded-2xl shadow-xl p-8 border border-slate-100">
-        <h1 className="text-3xl font-extrabold text-slate-900 mb-2">CanvasPick</h1>
-        <p className="text-slate-500 mb-8 text-sm">RWA Art Asset Management</p>
-
-        {!account ? (
-          <button onClick={connectWallet} className="w-full bg-blue-600 hover:bg-blue-700 text-black font-bold py-3 rounded-xl transition-all shadow-lg">
-            지갑 연결하여 시작하기
-          </button>
-        ) : (
-          <form onSubmit={handleMint} className="space-y-5">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-[10px] uppercase font-bold text-blue-600">Connected Wallet</p>
-              <p className="text-xs truncate text-blue-900">{account}</p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">1조각당 가격 (ETH)</label>
-              <input type="number" step="0.000001" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Metadata URI (IPFS)</label>
-              <input type="text" value={metadataUri} onChange={(e) => setMetadataUri(e.target.value)} className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="ipfs://..." />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">로열티 수령 주소 (Artist)</label>
-              <input type="text" value={royaltyAddress} onChange={(e) => setRoyaltyAddress(e.target.value)} className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-
-            <button type="submit" className="w-full bg-slate-200 hover:bg-slate-300 text-black font-bold py-3 rounded-xl transition-all shadow-md">
-              새로운 작품 등록 (10,000조각)
-            </button>
-            
-            {status && (
-              <div className="mt-4 p-3 rounded-lg bg-yellow-50 border border-yellow-100">
-                <p className="text-center text-xs text-yellow-800 font-medium whitespace-pre-line">{status}</p>
-              </div>
-            )}
-          </form>
-        )}
+    <div className="pt-20 min-h-screen bg-brand-bg flex flex-col p-6 select-none">
+      <div className="flex flex-col space-y-2 select-none">
+        <p className="home-title">
+          Pick your Art.
+        </p>
+        <p className="home-title">
+          Own your Share.
+        </p>
+        <p className="home-title">
+          Beyond the frame.
+        </p>
       </div>
     </div>
   );

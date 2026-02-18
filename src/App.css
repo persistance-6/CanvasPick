@@ -1,8 +1,14 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import url('https://fonts.googleapis.com/css2?family=Gasoek+One&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --color-brand-bg: #232C33;
+  --font-home-title: 'Gasoek One', sans-serif;
+  --color-home-title-primary: #DADFF7;
+  --color-home-title-secondary: #B5B2C2;
+  --color-brand-primary: #2563eb;
 }
 
 @layer base {
@@ -20,5 +26,13 @@
     &.active {
       @apply text-slate-900
     }
+  }
+
+  .home-title {
+    font-size: clamp(3.5rem, 8vw, 11rem);
+    @apply font-home-title text-home-title-primary font-normal leading-[0.95];
+    
+    letter-spacing: -0.02em;
+    display: block; /* 줄바꿈 보장 */
   }
 }
