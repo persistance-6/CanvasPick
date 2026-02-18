@@ -10,3 +10,15 @@
     font-family: var(--font-sans);
   }
 }
+
+@layer components {
+  .nav-link {
+    /* 기본 스타일을 @apply로 묶음 */
+    @apply font-semibold transition-colors text-slate-400 hover:text-slate-900;
+    
+    /* 활성화 상태를 위한 커스텀 변수나 클래스 정의 */
+    &.active {
+      @apply text-slate-900
+    }
+  }
+}

@@ -8,14 +8,15 @@ import MyAssets from './pages/MyAssets';
 import { formatAddress } from './utils/formatters';
 import "./App.css";
 import logo from './assets/logo.jpg'; // 경로 주의!
+import { Search, Menu, ShoppingCart } from 'lucide-react';
 
 function Navigation({ currentPage, setCurrentPage, isConnected, account, onConnect }) {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-[96%] mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* 로고 및 네비게이션 */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-5">
   
           {/* [로고 및 CanvasPick 글자 영역] - 항상 보임 */}
           <button
@@ -31,15 +32,13 @@ function Navigation({ currentPage, setCurrentPage, isConnected, account, onConne
               CanvasPick
             </span>
           </button>
+
+          <Search className="w-5 h-5 text-slate-400 hover:text-slate-600 cursor-pointer" />
             
             <div className="hidden md:flex gap-6">
               <button
                 onClick={() => setCurrentPage('gallery')}
-                className={`font-semibold transition-colors ${
-                  currentPage === 'gallery'
-                    ? 'text-blue-600'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className={`nav-link ${currentPage === 'gallery' ? 'active' : ''}`}
               >
                 갤러리
               </button>
@@ -47,31 +46,19 @@ function Navigation({ currentPage, setCurrentPage, isConnected, account, onConne
                 <>
                   <button
                     onClick={() => setCurrentPage('purchase')}
-                    className={`font-semibold transition-colors ${
-                      currentPage === 'purchase'
-                        ? 'text-blue-600'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`nav-link ${currentPage === 'purchase' ? 'active' : ''}`}
                   >
                     구매
                   </button>
                   <button
                     onClick={() => setCurrentPage('assets')}
-                    className={`font-semibold transition-colors ${
-                      currentPage === 'assets'
-                        ? 'text-blue-600'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`nav-link ${currentPage === 'assets' ? 'active' : ''}`}
                   >
                     내 자산
                   </button>
                   <button
                     onClick={() => setCurrentPage('mint')}
-                    className={`font-semibold transition-colors ${
-                      currentPage === 'mint'
-                        ? 'text-blue-600'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`nav-link ${currentPage === 'mint' ? 'active' : ''}`}
                   >
                     작품 등록
                   </button>
@@ -80,13 +67,16 @@ function Navigation({ currentPage, setCurrentPage, isConnected, account, onConne
             </div>
           </div>
 
-          {/* 지갑 버튼 */}
-          <button
-            onClick={onConnect}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            {isConnected ? formatAddress(account) : '지갑 연결'}
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onConnect}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              {isConnected ? formatAddress(account) : '지갑 연결'}
+            </button>
+            <Menu className="md:hidden w-6 h-6 hover:text-blue-600 cursor-pointer" />
+            <ShoppingCart className="w-5 h-5 hover:text-blue-600 cursor-pointer" />
+          </div>
         </div>
       </div>
     </nav>
