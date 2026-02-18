@@ -24,6 +24,7 @@ contract CanvasPickAsset is ERC1155, Ownable, ERC2981 {
     mapping(uint256 => EnumerableSet.AddressSet) private _artHolders; // 작품별 홀더 명단
     mapping(address => uint256[]) private _userOwnedIds;
     mapping(address => mapping(uint256 => bool)) private _isAdded;
+    mapping(address => bool) public whitelisted; // 화이트 리스트
     
     // 컬렉션 전체 정보 URI (마켓플레이스용)
     string private _contractURI;
@@ -34,6 +35,7 @@ contract CanvasPickAsset is ERC1155, Ownable, ERC2981 {
     event PriceChanged(uint256 indexed id, uint256 oldPrice, uint256 newPrice);
     event Withdrawal(address indexed owner, uint256 amount);
     event RoyaltyUpdated(uint256 indexed id, address indexed receiver, uint96 feeNumerator);
+    event WhitelistUpdated(address indexed user, bool status);
 
 
     constructor(string memory _initialBaseURI) ERC1155(_initialBaseURI) Ownable(msg.sender) {}
@@ -123,7 +125,7 @@ contract CanvasPickAsset is ERC1155, Ownable, ERC2981 {
     }
 
     /**
-     * [추가] 토큰 이동이 일어날 때마다 자동으로 실행되는 감시 함수
+     * 토큰 이동이 일어날 때마다 자동으로 실행되는 감시 함수
      * 구매, 선물 등 모든 이동 시 '홀더 명단'을 실시간으로 업데이트합니다.
      */
     function _update(
@@ -132,18 +134,22 @@ contract CanvasPickAsset is ERC1155, Ownable, ERC2981 {
         uint256[] memory ids, 
         uint256[] memory values
     ) internal override {
-        // 부모 컨트랙트의 로직 먼저 실행
+        // 민팅(from == 0)이 아니고 소각(to == 0)이 아닌 '일반 거래'일 때만 체크
+        if (from != address(0) && to != address(0)) {
+            require(whitelisted[from], "Sender not whitelisted");
+            require(whitelisted[to], "Recipient not whitelisted");
+        }
+
         super._update(from, to, ids, values);
         
         for (uint256 i = 0; i < ids.length; i++) {
             uint256 id = ids[i];
             
-            // 1. 받는 사람이 있고(소각이 아님), 잔액이 0보다 크면 홀더 명단 추가
-            if (to != address(0) && balanceOf(to, id) > 0) {
-                _artHolders[id].add(to);
+            if (to != address(0)) {
+                _artHolders[id].add(to); // 잔액 상관없이 일단 add (이미 있으면 무시됨)
             }
             
-            // 2. 보낸 사람이 있고(발행이 아님), 잔액이 0이 되면 홀더 명단 삭제
+            // 보낸 사람 처리
             if (from != address(0) && balanceOf(from, id) == 0) {
                 _artHolders[id].remove(from);
             }
@@ -190,6 +196,11 @@ contract CanvasPickAsset is ERC1155, Ownable, ERC2981 {
     function contractURI() public view returns (string memory) { return _contractURI; }
     function uri(uint256 id) public view override returns (string memory) {
         return _tokenURIs[id];
+    }
+    function setWhitelist(address user, bool status) external onlyOwner {
+        whitelisted[user] = status;
+
+        emit WhitelistUpdated(user, status);
     }
 
     /**
