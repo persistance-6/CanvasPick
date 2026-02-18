@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import CanvasPickAsset from './contracts/CanvasPickAsset.json';
+import "./App.css";
 
 // Remix에서 배포 후 받은 컨트랙트 주소
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
