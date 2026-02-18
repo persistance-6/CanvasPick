@@ -12,7 +12,9 @@ import { Search, Menu, ShoppingCart } from 'lucide-react';
 
 function Navigation({ currentPage, setCurrentPage, isConnected, account, onConnect }) {
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      currentPage === 'home' ? 'bg-white/10' : 'bg-white/70 shadow-sm'
+    } backdrop-blur-md border-b border-white/20`}>
       <div className="max-w-[96%] mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* 로고 및 네비게이션 */}
@@ -100,7 +102,7 @@ function AppContent() {
   };
 
   return (
-    <>
+    <div className="relative min-h-screen">
       <Navigation
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
@@ -109,7 +111,7 @@ function AppContent() {
         onConnect={handleConnect}
       />
 
-      <main>
+      <main className="min-h-screen">
         {currentPage === 'home' && <Home onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'gallery' && <Gallery onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'detail' && <ArtworkDetail artworkId={selectedArtworkId} />}
@@ -117,7 +119,7 @@ function AppContent() {
         {currentPage === 'mint' && <Home />}
         {currentPage === 'assets' && <MyAssets />}
       </main>
-    </>
+    </div>
   );
 }
 

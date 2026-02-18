@@ -56,7 +56,7 @@ function Purchase() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <div className="pt-20 min-h-screen bg-slate-50 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">작품 구매</h1>
         <p className="text-slate-600 mb-6">조각을 선택하여 구매하세요</p>

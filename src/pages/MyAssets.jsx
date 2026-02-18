@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useContract } from '../hooks/useContract';
 import { formatTokenAmount, formatPercentage, formatPrice } from '../utils/formatters';
+import { Loader2 } from 'lucide-react';
 
 function MyAssets() {
   const { isConnected, account } = useWallet();
@@ -46,7 +47,7 @@ function MyAssets() {
   }, BigInt(0)).toString();
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="pt-20 min-h-screen bg-slate-50 p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-slate-900 mb-2">나의 자산</h1>
         <p className="text-slate-600 mb-8">보유한 작품 조각들을 확인하세요</p>
@@ -56,8 +57,9 @@ function MyAssets() {
             <p className="text-slate-600 mb-4">지갑을 연결하여 자산을 확인하세요</p>
           </div>
         ) : loading ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600">로딩 중...</p>
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg shadow-sm">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+            <p className="text-slate-600 font-medium">자산을 불러오는 중입니다...</p>
           </div>
         ) : portfolio.ids.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-md">

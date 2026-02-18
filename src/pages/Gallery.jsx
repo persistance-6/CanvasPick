@@ -40,7 +40,7 @@ function Gallery({ onArtworkSelect }) {
   }, [isConnected]);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className=" pt-20 min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-slate-900 mb-8">Art Gallery</h1>
 
