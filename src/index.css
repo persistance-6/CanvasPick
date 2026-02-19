@@ -1,3 +1,50 @@
-@import "tailwindcss"; /* v4 기준 */
+@import "tailwindcss";
+/* v4 기준 */
 /* 또는 v3 기준 */
 /* @tailwind base; @tailwind components; @tailwind utilities; */
+
+/* src/index.css */
+@keyframes fade-zoom-in {
+    0% {
+        opacity: 0;
+        transform: rotateX(10deg) rotateY(10deg) rotateZ(-5deg) scale(0.5) translate(-20vw, -20vh);
+    }
+
+    100% {
+        opacity: 1;
+        transform: rotateX(10deg) rotateY(10deg) rotateZ(-5deg) scale(1) translate(0, 0);
+    }
+}
+
+/* Tailwind 유틸리티 클래스처럼 쓰기 위해 등록 */
+.animate-fade-zoom-in {
+    animation: fade-zoom-in 0.5s cubic-bezier(.09, .9, .29, .96) forwards;
+}
+
+/* src/index.css */
+@keyframes slide-in-right {
+    0% {
+        opacity: 0;
+        transform: translateX(20vw);
+        /* 50px 오른쪽에서 시작 */
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+        /* 제자리 */
+    }
+}
+
+/* Tailwind에서 인식할 수 있게 클래스로 등록 */
+.animate-slide-in {
+    animation: slide-in-right 1s cubic-bezier(.09, .9, .29, .96) forwards;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-400 {
+    animation-delay: 400ms;
+}

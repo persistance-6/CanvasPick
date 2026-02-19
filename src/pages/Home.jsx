@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import CanvasPickAsset from '../contracts/CanvasPickAsset.json';
-import BigPixelCursor from '../components/icons/BigPixelCursor';
+import NFTCard from '../components/NFTCard';
+import HomeTitle from '../components/HomeTitle';
 
 // Remix에서 배포 후 받은 컨트랙트 주소
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
@@ -82,8 +83,8 @@ function Home({ onArtworkSelect }) {
 
   return (
     <div className="pt-20 min-h-screen bg-brand-bg flex flex-col p-6 select-none">
-      <div className="flex-1 flex flex-col items-center justify-center space-y-2 select-none -translate-y-40">
-        <div className="flex space-x-4">
+      <div className="flex-1 flex flex-col justify-center space-y-2 select-none -translate-y-40 px-20">
+        {/* <div className="flex space-x-4">
           <span>
             <p className="home-title">
               Pick
@@ -99,14 +100,51 @@ function Home({ onArtworkSelect }) {
               Canvas
             </p>
           </span>
-        </div>
+        </div> */}
+        <HomeTitle />
 
+        {/* Home.jsx: 카드들이 겹쳐서 나열될 하단 영역 */}
+        <div className="absolute bottom-0 top-0 left-[40vw] flex justify-center items-end 
+        perspective-[2000px] 
+        [transform:rotateX(10deg)_rotateY(10deg)_rotateZ(-5deg)]
+                -space-x-36 hover:-space-x-56 transition-all duration-500 ease-in-out group pb-10
+          /* 2. 좌상단 Fade-in + Zoom-in 애니메이션 추가 */
+          /* 초기 상태: 투명도 0, 축소(0.5), 좌상단 이동(-200px) */
+          animate-[fade-zoom-in_1s_cubic-bezier(.09,.9,.29,.96)_forwards]
+        ">
 
-        <div className="absolute bottom-1/4 left-1/2 right-1/2 -rotate-8">
-          <BigPixelCursor className="w-32 h-32" />
+          {/* 카드 데이터 배열을 map으로 돌리면 더 편합니다 */}
+          {[
+            { id: "#00001", title: "별이 빛나는 밤에", artist: "엄준식" },
+            { id: "#00002", title: "디지털 르네상스", artist: "비탈릭" },
+            { id: "#00003", title: "얘 딴짓함", artist: "김하진" },
+            { id: "#00004", title: "코드로 그린 풍경", artist: "이더리움" },
+            { id: "#00005", title: "블록체인 속의 꿈", artist: "솔리디티" },
+          ].map((nft, index) => (
+            <div
+              key={nft.id}
+              style={{ zIndex: index, transform: `translateY(${index * 40}px)` }} // 뒤에 오는 카드가 위로 오게 설정
+              className="
+        relative flex-shrink-0 
+        w-[32vh] aspect-[1/1.618] 
+        rounded-[2.5rem] bg-black/40 backdrop-blur-xl 
+        border border-white/20 shadow-[0_15px_40px_rgba(0,0,0,0.5)] 
+        px-8 py-8 select-none z-10
+        hover:-translate-y-20 hover:scale-110 hover:rotate-3 
+        hover:z-[50] transition-all duration-300 cursor-pixel
+      "
+            >
+              <NFTCard
+                imageSrc={nft.img}
+                title={nft.title}
+                artist={nft.artist}
+                id={nft.id}
+              />
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
