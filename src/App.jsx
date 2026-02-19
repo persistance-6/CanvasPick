@@ -13,8 +13,8 @@ import { Search, Menu, ShoppingCart } from 'lucide-react';
 function Navigation({ currentPage, setCurrentPage, isConnected, account, onConnect }) {
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      currentPage === 'home' ? 'bg-white/10' : 'bg-white/70 shadow-sm'
-    } backdrop-blur-md border-b border-white/20`}>
+      currentPage === 'home' ? 'bg-white/0' : 'bg-white/70 shadow-sm border-b border-white/20'
+    } backdrop-blur-md`}>
       <div className="max-w-[96%] mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* 로고 및 네비게이션 */}

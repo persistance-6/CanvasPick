@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import CanvasPickAsset from '../contracts/CanvasPickAsset.json';
+import BigPixelCursor from '../components/icons/BigPixelCursor';
 
 // Remix에서 배포 후 받은 컨트랙트 주소
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
@@ -8,7 +9,7 @@ const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 function Home({ onArtworkSelect }) {
   const [account, setAccount] = useState("");
   const [status, setStatus] = useState("");
-  
+
   // 입력 폼 상태 관리
   const [price, setPrice] = useState("0.0001"); // 1조각당 가격 (ETH 단위)
   const [metadataUri, setMetadataUri] = useState("ipfs://bafkreicks47z6tmz6zp7vpwrwlchlsdt62gpqwi5uyyhhhzp445xzcnvim"); // Pinata 등에서 받은 URI
@@ -34,7 +35,7 @@ function Home({ onArtworkSelect }) {
 
     try {
       setStatus("민팅 트랜잭션 전송 중...");
-      
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CanvasPickAsset.abi, signer);
@@ -48,7 +49,7 @@ function Home({ onArtworkSelect }) {
 
       // 1. 가격 단위를 ETH에서 Wei로 변환
       const priceInWei = ethers.parseEther(price);
-      
+
       // 2. 솔리디티 mintArt 함수 파라미터 구성
       // function mintArt(uint256[] pricePerShares, bytes data, string[] uris, address royaltyReceiver, uint96 feeNumerator)
       const prices = [priceInWei];      // 배열 형태
@@ -57,16 +58,16 @@ function Home({ onArtworkSelect }) {
       const feeNumerator = 500;         // 로열티 5% (500/10000)
 
       const tx = await contract.mintArt(
-        prices, 
-        data, 
-        uris, 
-        royaltyAddress, 
+        prices,
+        data,
+        uris,
+        royaltyAddress,
         feeNumerator
       );
 
       setStatus("블록체인 확인 중 (Confirming)...");
       await tx.wait();
-      
+
       setStatus(`민팅 완료! 작품이 10,000조각으로 발행되었습니다.`);
     } catch (err) {
       console.error(err);
@@ -81,16 +82,29 @@ function Home({ onArtworkSelect }) {
 
   return (
     <div className="pt-20 min-h-screen bg-brand-bg flex flex-col p-6 select-none">
-      <div className="flex flex-col space-y-2 select-none">
-        <p className="home-title">
-          Pick your Art.
-        </p>
-        <p className="home-title">
-          Own your Share.
-        </p>
-        <p className="home-title">
-          Beyond the frame.
-        </p>
+      <div className="flex-1 flex flex-col items-center justify-center space-y-2 select-none -translate-y-40">
+        <div className="flex space-x-4">
+          <span>
+            <p className="home-title">
+              Pick
+            </p>
+          </span>
+          <span>
+            <p className="home-title">
+              Your
+            </p>
+          </span>
+          <span>
+            <p className="home-title">
+              Canvas
+            </p>
+          </span>
+        </div>
+
+
+        <div className="absolute bottom-1/4 left-1/2 right-1/2 -rotate-8">
+          <BigPixelCursor className="w-32 h-32" />
+        </div>
       </div>
     </div>
   );
