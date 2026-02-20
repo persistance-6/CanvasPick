@@ -23,14 +23,14 @@ function Navigation({ currentPage, setCurrentPage, isConnected, account, onConne
           {/* [로고 및 CanvasPick 글자 영역] - 항상 보임 */}
           <button
             onClick={() => setCurrentPage('home')}
-            className="flex items-center gap-2 group" // 로고와 글자 사이 간격 및 그룹화
+            className="flex items-center gap-2 group cursor-pointer hover:scale-103 transition-transform duration-250" // 로고와 글자 사이 간격 및 그룹화
           >
             <img 
               src={logo} 
               alt="CanvasPick Logo" 
               className="h-9 w-auto object-contain rounded-md" // 4k에서도 너무 작지 않게 h-9(36px) 적용
             />
-            <span className="hidden md:flex text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors">
+            <span className="hidden md:flex text-2xl font-extrabold text-brand-gradient transition-colors">
               CanvasPick
             </span>
           </button>
@@ -72,7 +72,7 @@ function Navigation({ currentPage, setCurrentPage, isConnected, account, onConne
           <div className="flex items-center gap-4">
             <button
               onClick={onConnect}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              className="btn-brand-gradient text-slate-900 font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               {isConnected ? formatAddress(account) : '지갑 연결'}
             </button>

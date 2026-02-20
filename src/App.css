@@ -8,7 +8,10 @@
   --font-home-title: 'Gasoek One', sans-serif;
   --color-home-title-primary: #DADFF7;
   --color-home-title-secondary: #B5B2C2;
-  --color-brand-primary: #2563eb;
+  --color-brand-primary: #01EEAF;
+  --color-brand-secondary: #19E6E9;
+
+  --background-image-brand-gradient: linear-gradient(to right, var(--color-brand-primary), var(--color-brand-secondary));
 }
 
 @layer base {
@@ -38,5 +41,25 @@
     letter-spacing: -0.02em;
     display: block;
     /* 줄바꿈 보장 */
+  }
+
+  /* 1. 순수 그라데이션 배경 (버튼용) */
+  .bg-brand-gradient {
+    background-image: var(--background-image-brand-gradient);
+  }
+
+  /* 2. 텍스트 그라데이션 (텍스트 전용) */
+  .text-brand-gradient {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+    /* 인라인 요소에서도 배경이 잘리지 않도록 함 */
+    display: inline-block;
+  }
+
+  /* 3. 그라데이션 버튼 (호버 효과 포함) */
+  .btn-brand-gradient {
+    @apply bg-brand-gradient text-white px-6 py-2 rounded-lg font-medium transition-opacity;
+    &:hover {
+      @apply opacity-90;
+    }
   }
 }

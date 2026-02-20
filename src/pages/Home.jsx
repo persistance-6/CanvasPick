@@ -115,11 +115,11 @@ function Home({ onArtworkSelect }) {
 
           {/* 카드 데이터 배열을 map으로 돌리면 더 편합니다 */}
           {[
-            { id: "#00001", title: "별이 빛나는 밤에", artist: "엄준식" },
-            { id: "#00002", title: "디지털 르네상스", artist: "비탈릭" },
-            { id: "#00003", title: "얘 딴짓함", artist: "김하진" },
-            { id: "#00004", title: "코드로 그린 풍경", artist: "이더리움" },
-            { id: "#00005", title: "블록체인 속의 꿈", artist: "솔리디티" },
+            { id: "#00001", title: "별이 빛나는 밤에", artist: "빈센트 1/2 고흐" },
+            { id: "#00002", title: "디지털 르네상스", artist: "비탈릭", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgdPvqe2c18ddlVe5K8fKzEyO-_WgFaItuKgEM3kb4vH85h6tVsRQSXR4_2L-Xd0INgDu6JG9V4xJfBTY14WsdLkmTIgXvkc1neJNW3p4nVDuZsu-y1doA5pvC4BOas6TUZDF6PNc95ntk/s1600/DSCN2523.JPG" },
+            { id: "#00003", title: "얘 딴짓함", artist: "김하진", img: "https://www.artbyalysia.com/uploads/6/1/6/5/61653353/7978579_orig.jpg" },
+            { id: "#00004", title: "코드로 그린 풍경", artist: "이더리움", img: "https://i.pinimg.com/1200x/51/87/b1/5187b1e0dff46c926e5babeb76aca264.jpg" },
+            { id: "#00005", title: "블록체인 속의 꿈", artist: "솔리디티", img: "https://www.sciencefriday.com/wp-content/uploads/2021/05/Vakseen-The_Resilience_of_a_Rose_8x8__Acrylic_on_wood_2020.jpg" },
           ].map((nft, index) => (
             <div
               key={nft.id}
