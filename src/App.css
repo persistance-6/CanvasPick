@@ -58,8 +58,21 @@
   /* 3. 그라데이션 버튼 (호버 효과 포함) */
   .btn-brand-gradient {
     @apply bg-brand-gradient text-white px-6 py-2 rounded-lg font-medium transition-opacity;
+
     &:hover {
       @apply opacity-90;
     }
+  }
+}
+
+@keyframes slide-down-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
