@@ -14,6 +14,7 @@ import { TARGET_NETWORK } from '../constants/contract';
 function WalletModal({ account, provider, onDisconnect, onClose }) {
     const modalRef = useRef(null);
     const [ethBalance, setEthBalance] = useState(null);
+    const [usdBalance, setUsdBalance] = useState(null);
     const [networkName, setNetworkName] = useState('');
     const [isWrongNetwork, setIsWrongNetwork] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -43,8 +44,28 @@ function WalletModal({ account, provider, onDisconnect, onClose }) {
                     method: 'eth_getBalance',
                     params: [account, 'latest'],
                 });
-                const balanceEth = parseFloat(ethers.formatEther(balanceHex)).toFixed(4);
+                const balanceEthNum = parseFloat(ethers.formatEther(balanceHex));
+                const balanceEth = balanceEthNum.toFixed(4);
                 setEthBalance(balanceEth);
+
+                // CoinGecko에서 ETH 현재 USD 가격 조회
+                try {
+                    const priceRes = await fetch(
+                        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
+                    );
+                    const priceData = await priceRes.json();
+                    const ethPriceUsd = priceData?.ethereum?.usd;
+                    if (ethPriceUsd) {
+                        const usd = (balanceEthNum * ethPriceUsd).toLocaleString('en-US', {
+                            style: 'currency',
+                            currency: 'USD',
+                            maximumFractionDigits: 2,
+                        });
+                        setUsdBalance(usd);
+                    }
+                } catch {
+                    setUsdBalance(null);
+                }
 
                 // 네트워크(체인) 이름 조회
                 const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
@@ -183,7 +204,12 @@ function WalletModal({ account, provider, onDisconnect, onClose }) {
                             {loadingBalance ? (
                                 <span className="text-sm text-slate-400">로딩 중...</span>
                             ) : (
-                                <p className="text-sm font-semibold text-slate-800">{ethBalance} ETH</p>
+                                <>
+                                    <p className="text-sm font-semibold text-slate-800">{ethBalance} ETH</p>
+                                    {usdBalance && (
+                                        <p className="text-xs text-slate-400 mt-0.5">≈ {usdBalance}</p>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
