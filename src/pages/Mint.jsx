@@ -1,76 +1,99 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { useWallet } from '../context/WalletContext';
 import CanvasPickAsset from '../contracts/CanvasPickAsset.json';
+import { uploadImageToIPFS, uploadMetadataToIPFS } from '../services/pinataService';
+import FormInput from '../components/FormInput';
+import FormTextArea from '../components/FormTextArea';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 
-function Mint() {
-    const { isConnected, account } = useWallet();
+/** 로얄티는 플랫폼 정책으로 고정 */
+const ROYALTY_FEE_PERCENT = 5; // 5%
+const ROYALTY_FEE_NUMERATOR = ROYALTY_FEE_PERCENT * 100; // basis points
 
-    // 입력 폼 상태 관리
-    const [price, setPrice] = useState("0.0001");               // 1조각당 가격 (ETH 단위)
-    const [metadataUri, setMetadataUri] = useState("");          // IPFS 메타데이터 URI
-    const [royaltyAddress, setRoyaltyAddress] = useState(account || ""); // 로열티 수령 주소
-    const [royaltyFee, setRoyaltyFee] = useState("5");          // 로열티 비율 (%)
-    const [status, setStatus] = useState("");
+function Mint({ onMintSuccess }) {
+    const { isConnected, account } = useWallet();
+    const fileInputRef = useRef(null);
+
+    // ── 폼 상태 ──────────────────────────────────────
+    const [artworkName, setArtworkName]         = useState('');
+    const [description, setDescription]         = useState('');
+    const [artistId, setArtistId]               = useState('');
+    const [price, setPrice]                     = useState('0.0001');
+    const [storageLocation, setStorageLocation] = useState('');
+    const [imageFile, setImageFile]             = useState(null);   // File 객체
+    const [imagePreview, setImagePreview]       = useState(null);   // 미리보기 URL
+
+    // ── 진행 상태 ─────────────────────────────────────
+    const [step, setStep]     = useState('');   // 단계 텍스트
+    const [status, setStatus] = useState('');   // 최종 결과
     const [loading, setLoading] = useState(false);
+
+    // 이미지 선택 핸들러
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+    };
 
     const handleMint = async (e) => {
         e.preventDefault();
-        if (!window.ethereum) {
-            setStatus("❌ MetaMask를 설치해주세요.");
-            return;
-        }
-        if (!isConnected) {
-            setStatus("❌ 지갑을 먼저 연결하세요.");
-            return;
-        }
+        if (!window.ethereum) { setStatus('❌ MetaMask를 설치해주세요.'); return; }
+        if (!isConnected)     { setStatus('❌ 지갑을 먼저 연결하세요.');  return; }
+        if (!imageFile)       { setStatus('❌ 작품 이미지를 선택해주세요.'); return; }
 
         setLoading(true);
-        setStatus("민팅 트랜잭션 전송 중...");
+        setStatus('');
 
         try {
+            // ── Step 1: 이미지 → IPFS ───────────────────
+            setStep('📤 이미지를 IPFS에 업로드 중...');
+            const imageUri = await uploadImageToIPFS(imageFile);
+
+            // ── Step 2: 메타데이터 JSON → IPFS ──────────
+            setStep('📋 메타데이터 JSON을 IPFS에 업로드 중...');
+            const metadataUri = await uploadMetadataToIPFS({
+                name: artworkName,
+                description,
+                artistId,
+                pricePerShare: price,
+                imageUri,
+                storageLocation,
+            });
+
+            // ── Step 3: 민팅 트랜잭션 전송 ───────────────
+            setStep('⛓️ 블록체인에 민팅 트랜잭션 전송 중...');
             const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
+            const signer   = await provider.getSigner();
             const contract = new ethers.Contract(CONTRACT_ADDRESS, CanvasPickAsset.abi, signer);
-
-            // 화이트리스트 체크
-            const isWhitelisted = await contract.whitelisted(account);
-            if (!isWhitelisted) {
-                setStatus("❌ 화이트리스트에 등록되지 않은 지갑입니다. 관리자에게 문의하세요.");
-                setLoading(false);
-                return;
-            }
-
-            // 가격 단위를 ETH → Wei 변환
+            
             const priceInWei = ethers.parseEther(price);
 
-            // 로열티 비율: % → basis points (5% = 500)
-            const feeNumerator = Math.round(parseFloat(royaltyFee) * 100);
-
-            // mintArt(uint256[] pricePerShares, bytes data, string[] uris, address royaltyReceiver, uint96 feeNumerator)
             const tx = await contract.mintArt(
                 [priceInWei],
-                "0x",
+                '0x',
                 [metadataUri],
-                royaltyAddress || account,
-                feeNumerator
+                account,            // 로열티 수령 = 민팅 지갑
+                ROYALTY_FEE_NUMERATOR
             );
 
-            setStatus("블록체인 확인 중 (Confirming)...");
+            setStep('⏳ 블록 확인 중 (Confirming)...');
             await tx.wait();
 
-            setStatus("✅ 민팅 완료! 작품이 10,000조각으로 발행되었습니다.");
+            // 민팅 성공 → MintSuccess 페이지로 이동
+            onMintSuccess?.();
         } catch (err) {
             console.error(err);
-            if (err.message?.includes("OwnableUnauthorizedAccount")) {
-                setStatus("❌ 컨트랙트 배포자(Owner)만 민팅할 수 있습니다.");
+            if (err.message?.includes('OwnableUnauthorizedAccount')) {
+                setStatus('❌ 컨트랙트 배포자(Owner)만 민팅할 수 있습니다.');
             } else {
-                setStatus(`❌ 오류: ${err.reason || err.message}`);
+                setStatus(`❌ 오류: ${err.reason ?? err.message}`);
             }
         } finally {
             setLoading(false);
+            setStep('');
         }
     };
 
@@ -79,7 +102,8 @@ function Mint() {
             <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">작품 등록</h1>
                 <p className="text-slate-500 mb-6 text-sm">
-                    작품을 NFT로 민팅하여 10,000조각으로 분할 발행합니다.
+                    작품 정보를 입력하면 이미지와 메타데이터가 IPFS에 자동 업로드된 후
+                    10,000조각 NFT로 민팅됩니다.
                 </p>
 
                 {!isConnected ? (
@@ -88,68 +112,89 @@ function Mint() {
                     </div>
                 ) : (
                     <form onSubmit={handleMint} className="space-y-5">
-                        {/* 메타데이터 URI */}
+
+                        {/* 작품 이미지 업로드 */}
                         <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                                메타데이터 URI <span className="text-red-500">*</span>
+                                작품 이미지 <span className="text-red-500">*</span>
                             </label>
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-44 rounded-xl border-2 border-dashed border-slate-200
+                                           bg-slate-50 hover:bg-slate-100 transition-colors
+                                           flex items-center justify-center cursor-pointer overflow-hidden"
+                            >
+                                {imagePreview ? (
+                                    <img
+                                        src={imagePreview}
+                                        alt="미리보기"
+                                        className="w-full h-full object-contain"
+                                    />
+                                ) : (
+                                    <div className="text-center text-slate-400 text-sm select-none">
+                                        <p className="text-2xl mb-1">🖼️</p>
+                                        <p>클릭하여 이미지 선택</p>
+                                        <p className="text-xs mt-0.5">PNG / JPG / GIF / WEBP</p>
+                                    </div>
+                                )}
+                            </div>
                             <input
-                                type="text"
-                                required
-                                placeholder="ipfs://..."
-                                value={metadataUri}
-                                onChange={(e) => setMetadataUri(e.target.value)}
-                                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImageChange}
                             />
-                            <p className="text-xs text-slate-400 mt-1">Pinata 등에서 업로드 후 받은 IPFS URI를 입력하세요.</p>
                         </div>
+
+                        {/* 작품 이름 */}
+                        <FormInput
+                            label="작품 이름"
+                            required
+                            placeholder="별이 빛나는 밤에"
+                            value={artworkName}
+                            onChange={(e) => setArtworkName(e.target.value)}
+                        />
+
+                        {/* 작품 설명 */}
+                        <FormTextArea
+                            label="작품 설명"
+                            required
+                            rows={3}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+
+                        {/* 작가 고유 ID */}
+                        <FormInput
+                            label="작가 ID"
+                            required
+                            placeholder="임시 인풋입니다. 아무거나 입력하세요."
+                            value={artistId}
+                            onChange={(e) => setArtistId(e.target.value)}
+                            hint="플랫폼에서 사용하는 작가 고유 식별자입니다."
+                        />
+
+                        {/* 실물 보관 장소 */}
+                        <FormInput
+                            label="실물 보관 장소"
+                            required
+                            placeholder="치장 창고 한구석"
+                            value={storageLocation}
+                            onChange={(e) => setStorageLocation(e.target.value)}
+                        />
 
                         {/* 조각당 가격 */}
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                                조각당 가격 (ETH) <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="number"
-                                required
-                                step="0.0001"
-                                min="0.0001"
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
-                                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        {/* 로열티 수령 주소 */}
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                                로열티 수령 주소
-                            </label>
-                            <input
-                                type="text"
-                                placeholder={account || "0x..."}
-                                value={royaltyAddress}
-                                onChange={(e) => setRoyaltyAddress(e.target.value)}
-                                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <p className="text-xs text-slate-400 mt-1">비워두면 연결된 지갑 주소로 설정됩니다.</p>
-                        </div>
-
-                        {/* 로열티 비율 */}
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                                로열티 비율 (%)
-                            </label>
-                            <input
-                                type="number"
-                                min="0"
-                                max="10"
-                                step="0.5"
-                                value={royaltyFee}
-                                onChange={(e) => setRoyaltyFee(e.target.value)}
-                                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
+                        <FormInput
+                            label="조각당 가격 (ETH)"
+                            required
+                            type="number"
+                            step="0.0001"
+                            min="0.0001"
+                            placeholder="0.0001"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                        />
 
                         {/* 민팅 요약 */}
                         <div className="p-4 bg-slate-50 rounded-lg space-y-1 text-sm">
@@ -161,6 +206,10 @@ function Mint() {
                                 <span className="text-slate-500">조각당 가격</span>
                                 <span className="font-semibold">{price} ETH</span>
                             </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-500">로열티</span>
+                                <span className="font-semibold">{ROYALTY_FEE_PERCENT}% (고정)</span>
+                            </div>
                             <div className="flex justify-between border-t border-slate-200 pt-2 mt-2">
                                 <span className="font-bold">총 시가</span>
                                 <span className="font-bold text-blue-600">
@@ -169,14 +218,24 @@ function Mint() {
                             </div>
                         </div>
 
-                        {/* 상태 메시지 */}
-                        {status && (
-                            <div className={`p-3 rounded-lg text-sm font-medium ${status.startsWith("✅")
-                                    ? "bg-green-50 text-green-800 border border-green-200"
-                                    : status.startsWith("❌")
-                                        ? "bg-red-50 text-red-800 border border-red-200"
-                                        : "bg-blue-50 text-blue-800 border border-blue-200"
-                                }`}>
+                        {/* 진행 단계 표시 */}
+                        {loading && step && (
+                            <div className="p-3 rounded-lg text-sm font-medium bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-2">
+                                <svg className="animate-spin w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                </svg>
+                                {step}
+                            </div>
+                        )}
+
+                        {/* 최종 결과 메시지 */}
+                        {!loading && status && (
+                            <div className={`p-3 rounded-lg text-sm font-medium ${
+                                status.startsWith('✅')
+                                    ? 'bg-green-50 text-green-800 border border-green-200'
+                                    : 'bg-red-50 text-red-800 border border-red-200'
+                            }`}>
                                 {status}
                             </div>
                         )}
@@ -186,7 +245,7 @@ function Mint() {
                             disabled={loading}
                             className="w-full btn-brand-gradient text-slate-900 font-bold py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? "처리 중..." : "작품 민팅하기"}
+                            {loading ? '처리 중...' : '작품 민팅하기'}
                         </button>
                     </form>
                 )}

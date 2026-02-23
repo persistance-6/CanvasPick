@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Gallery from './pages/Gallery';
 import ArtworkDetail from './pages/ArtworkDetail';
 import Mint from './pages/Mint';
+import MintSuccess from './pages/MintSuccess';
 import MyAssets from './pages/MyAssets';
 import WalletModal from './components/WalletModal';
 import { formatAddress } from './utils/formatters';
@@ -130,7 +131,8 @@ function AppContent() {
         {currentPage === 'home' && <Home onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'gallery' && <Gallery onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'detail' && <ArtworkDetail artworkId={selectedArtworkId} />}
-        {currentPage === 'mint' && <Mint />}
+        {currentPage === 'mint' && <Mint onMintSuccess={() => setCurrentPage('mint-success')} />}
+        {currentPage === 'mint-success' && <MintSuccess onNavigateHome={() => setCurrentPage('home')} />}
         {currentPage === 'assets' && <MyAssets />}
       </main>
     </div>
