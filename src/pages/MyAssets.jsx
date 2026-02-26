@@ -16,7 +16,7 @@ async function fetchMetadata(uri) {
   return res.json();
 }
 
-function MyAssets() {
+function MyAssets({ onArtworkSelect }) {
   const { isConnected, account } = useWallet();
   const { getUserPortfolio, getSharePrice, getTokenURI } = useContract();
 
@@ -180,10 +180,11 @@ function MyAssets() {
                 return (
                   <div
                     key={asset.id}
+                    onClick={() => onArtworkSelect?.(asset.id)}
                     className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     {/* 이미지 */}
-                    <div className="relative w-full h-52 bg-slate-100">
+                    <div className="relative w-full aspect-square bg-slate-100">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
