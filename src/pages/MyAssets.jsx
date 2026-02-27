@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useContract } from '../hooks/useContract';
 import { formatTokenAmount, formatPercentage, formatPrice, ipfsToHttp } from '../utils/formatters';
+import { useEthPrice } from '../hooks/useEthPrice';
 import { Loader2, ImageOff, RefreshCw } from 'lucide-react';
 
 /**
@@ -19,6 +20,7 @@ async function fetchMetadata(uri) {
 function MyAssets({ onArtworkSelect }) {
   const { isConnected, account } = useWallet();
   const { getUserPortfolio, getSharePrice, getTokenURI } = useContract();
+  const { weiToUsd } = useEthPrice();
 
   // 자산 목록: { id, balance, price, metadata: { name, image, description, attributes } }
   const [assets, setAssets] = useState([]);
@@ -107,7 +109,7 @@ function MyAssets({ onArtworkSelect }) {
           {isConnected && !loading && (
             <button
               onClick={loadPortfolio}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               새로고침
@@ -155,6 +157,9 @@ function MyAssets({ onArtworkSelect }) {
                 <div>
                   <p className="text-sm text-slate-500 mb-1">총 자산 가치</p>
                   <p className="text-2xl font-bold text-blue-600">{formatPrice(totalValue)}</p>
+                  {weiToUsd(totalValue) && (
+                    <p className="text-sm text-slate-400 font-medium">{weiToUsd(totalValue)}</p>
+                  )}
                 </div>
                 <div>
                   <p className="text-sm text-slate-500 mb-1">보유 작품 수</p>
@@ -228,11 +233,21 @@ function MyAssets({ onArtworkSelect }) {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-500">조각당 가격</span>
-                          <span className="font-semibold text-slate-900">{formatPrice(asset.price)}</span>
+                          <div className="text-right">
+                            <span className="font-semibold text-slate-900">{formatPrice(asset.price)}</span>
+                            {weiToUsd(asset.price) && (
+                              <p className="text-xs text-slate-400">{weiToUsd(asset.price)}</p>
+                            )}
+                          </div>
                         </div>
                         <div className="border-t border-slate-100 pt-2 flex justify-between">
                           <span className="text-slate-500">총 가치</span>
-                          <span className="font-bold text-blue-600">{formatPrice(value)}</span>
+                          <div className="text-right">
+                            <span className="font-bold text-blue-600">{formatPrice(value)}</span>
+                            {weiToUsd(value) && (
+                              <p className="text-xs text-slate-400">{weiToUsd(value)}</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useContract } from '../hooks/useContract';
 import { formatAddress, formatPrice, formatTokenAmount, formatPercentage, formatEth, ipfsToHttp } from '../utils/formatters';
+import { useEthPrice } from '../hooks/useEthPrice';
 import { CONTRACT_ADDRESS, TARGET_NETWORK } from '../constants/contract';
 import {
   Loader2, ArrowLeft, ImageOff, ExternalLink,
@@ -70,7 +71,7 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
   const [price, setPrice] = useState(null);
   const [holders, setHolders] = useState([]);
   const [tokenUri, setTokenUri] = useState('');
-  const [ethPriceUsd, setEthPriceUsd] = useState(null);
+  const { weiToUsd } = useEthPrice();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -88,17 +89,6 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
 
       setPrice(priceRes.toString());
       setTokenUri(uriRes);
-
-      // CoinGecko에서 ETH → USD 가격 조회
-      try {
-        const cgRes = await fetch(
-          'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
-        );
-        const cgData = await cgRes.json();
-        if (cgData?.ethereum?.usd) setEthPriceUsd(cgData.ethereum.usd);
-      } catch {
-        setEthPriceUsd(null);
-      }
 
       const holderList = holdersRes.holders.map((addr, idx) => ({
         address: addr,
@@ -136,17 +126,6 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
   const soldShares = holders.reduce((sum, h) => sum + BigInt(h.balance), 0n);
   const availableShares = BigInt(TOTAL_SHARES) - soldShares;
   const totalMarketCap = price ? (BigInt(price) * BigInt(TOTAL_SHARES)).toString() : '0';
-
-  /** wei 값을 달러 문자열로 변환 */
-  const weiToUsd = (wei) => {
-    if (!wei || !ethPriceUsd) return null;
-    const ethValue = parseFloat(formatEth(wei));
-    return (ethValue * ethPriceUsd).toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 2,
-    });
-  };
 
   // 현재 사용자의 보유량
   const myHolding = holders.find(
@@ -220,8 +199,8 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
               </div>
             </div>
 
-            {/* 설명 */}
-            <CollapsibleSection icon={FileText} title="설명">
+            {/* 세부 정보 */}
+            <CollapsibleSection icon={Info} title="세부 정보">
               <div className="px-5 py-4 text-sm text-slate-700 leading-relaxed">
                 <p className="text-xs text-slate-400 mb-1">by <span className="text-slate-600 font-medium">{artist}</span></p>
                 {description ? (
@@ -230,30 +209,7 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
                   <p className="text-slate-400 italic">설명이 없습니다.</p>
                 )}
               </div>
-            </CollapsibleSection>
-
-            {/* 속성 (Traits) */}
-            {attributes.length > 0 && (
-              <CollapsibleSection icon={Tag} title="속성" count={attributes.length}>
-                <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {attributes.map((attr, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center"
-                    >
-                      <p className="text-[10px] font-semibold text-blue-500 uppercase tracking-wider mb-0.5">
-                        {attr.trait_type}
-                      </p>
-                      <p className="text-sm font-bold text-slate-900 truncate">{attr.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </CollapsibleSection>
-            )}
-
-            {/* 세부 정보 */}
-            <CollapsibleSection icon={Info} title="세부 정보" defaultOpen={false}>
-              <div className="px-5 py-4 space-y-3 text-sm">
+              <div className="border-t border-slate-200 px-5 py-4 space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-500">컨트랙트 주소</span>
                   <a href={contractLink} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline font-mono text-xs flex items-center gap-1">
@@ -272,16 +228,37 @@ function ArtworkDetail({ artworkId = 1, onBack }) {
                   <span className="text-slate-500">체인</span>
                   <span className="font-semibold text-slate-900">{TARGET_NETWORK.chainName}</span>
                 </div>
-                {tokenUri && (
+                {metadata?.image && (
                   <div className="flex justify-between items-start">
-                    <span className="text-slate-500">메타데이터</span>
-                    <a href={ipfsToHttp(tokenUri)} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs flex items-center gap-1 max-w-[180px] truncate">
-                      IPFS <ExternalLink className="w-3 h-3 shrink-0" />
+                    <span className="text-slate-500">원본 이미지</span>
+                    <a href={ipfsToHttp(metadata.image)} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs flex items-center gap-1 max-w-[180px] truncate">
+                      보기 <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   </div>
                 )}
               </div>
             </CollapsibleSection>
+
+            {/* 속성 (Traits) */}
+            {attributes.length > 0 && (
+              <CollapsibleSection icon={Tag} title="속성" count={attributes.length}>
+                <div className="p-4 space-y-2">
+                  {attributes.map((attr, idx) => (
+                    <div
+                      key={idx}
+                      className="flex justify-between items-center bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5"
+                    >
+                      <span className="text-[11px] font-semibold text-blue-500 uppercase tracking-wider shrink-0 mr-4">
+                        {attr.trait_type}
+                      </span>
+                      <span className="text-sm font-bold text-slate-900 truncate text-right" title={attr.value}>
+                        {attr.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
           </div>
 
           {/* ════════════ 오른쪽: 타이틀 + 가격 + 소유 통계 + 홀더 목록 ════════════ */}

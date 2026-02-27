@@ -189,9 +189,9 @@ function Mint({ onMintSuccess }) {
                             label="조각당 가격 (ETH)"
                             required
                             type="number"
-                            step="0.0001"
-                            min="0.0001"
-                            placeholder="0.0001"
+                            step="0.000001"
+                            min="0.000001"
+                            placeholder="0.000001"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
                         />
