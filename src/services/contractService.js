@@ -94,4 +94,14 @@ export const contractService = {
     const uri = await contract.uri(id);
     return uri;
   },
+
+  /**
+   * 등록된 모든 작품 ID 조회
+   * @returns {Promise<number[]>} 등록된 작품 ID 배열 (Number 변환 완료)
+   */
+  async getAllArtIds(provider) {
+    const contract = this.getReadOnlyContract(provider);
+    const ids = await contract.getAllArtIds();
+    return ids.map((id) => Number(id));
+  },
 };

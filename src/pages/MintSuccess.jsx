@@ -1,6 +1,6 @@
 import React from 'react';
 
-function MintSuccess({ onNavigateHome }) {
+function MintSuccess({ mintedArtId, onViewArtwork, onNavigateHome }) {
 
     return (
         <div className="pt-20 min-h-screen bg-slate-50 flex items-center justify-center p-6">
@@ -27,10 +27,7 @@ function MintSuccess({ onNavigateHome }) {
                 <div className="space-y-3">
                     {/* 작품 보러 가기 (브랜드 색상) */}
                     <button
-                        onClick={() => {
-                            // TODO: ArtworkDetail로 이동 (artworkId 필요)
-                            console.log('작품 상세 페이지로 이동 (추후 구현)');
-                        }}
+                        onClick={() => onViewArtwork?.(mintedArtId)}
                         className="w-full btn-brand-gradient text-slate-900 font-bold py-3 rounded-xl transition-all hover:scale-[1.02]"
                     >
                         작품 보러 가기

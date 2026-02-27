@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { useWallet } from '../context/WalletContext';
 import CanvasPickAsset from '../contracts/CanvasPickAsset.json';
-import { uploadImageToIPFS, uploadMetadataToIPFS } from '../services/pinataService';
+import { uploadArtwork } from '../services/pinataService';
 import FormInput from '../components/FormInput';
 import FormTextArea from '../components/FormTextArea';
 
@@ -48,26 +48,28 @@ function Mint({ onMintSuccess }) {
         setStatus('');
 
         try {
-            // ── Step 1: 이미지 → IPFS ───────────────────
-            setStep('📤 이미지를 IPFS에 업로드 중...');
-            const imageUri = await uploadImageToIPFS(imageFile);
+            // ── Step 0: 다음 작품 ID 조회 ────────────────
+            setStep('🔍 작품 ID 확인 중...');
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer   = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CanvasPickAsset.abi, signer);
 
-            // ── Step 2: 메타데이터 JSON → IPFS ──────────
-            setStep('📋 메타데이터 JSON을 IPFS에 업로드 중...');
-            const metadataUri = await uploadMetadataToIPFS({
+            const allIds = await contract.getAllArtIds();
+            const nextArtId = allIds.length + 1;
+
+            // ── Step 1: 이미지 + 메타데이터를 IPFS 폴더로 업로드 ─────────
+            setStep('📤 이미지와 메타데이터를 IPFS에 업로드 중...');
+            const metadataUri = await uploadArtwork(imageFile, {
                 name: artworkName,
                 description,
                 artistId,
                 pricePerShare: price,
-                imageUri,
                 storageLocation,
+                artId: nextArtId,
             });
 
-            // ── Step 3: 민팅 트랜잭션 전송 ───────────────
+            // ── Step 2: 민팅 트랜잭션 전송 ───────────────
             setStep('⛓️ 블록체인에 민팅 트랜잭션 전송 중...');
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer   = await provider.getSigner();
-            const contract = new ethers.Contract(CONTRACT_ADDRESS, CanvasPickAsset.abi, signer);
             
             const priceInWei = ethers.parseEther(price);
 
@@ -82,8 +84,8 @@ function Mint({ onMintSuccess }) {
             setStep('⏳ 블록 확인 중 (Confirming)...');
             await tx.wait();
 
-            // 민팅 성공 → MintSuccess 페이지로 이동
-            onMintSuccess?.();
+            // 민팅 성공 → MintSuccess 페이지로 이동 (민팅된 작품 ID 전달)
+            onMintSuccess?.(nextArtId);
         } catch (err) {
             console.error(err);
             if (err.message?.includes('OwnableUnauthorizedAccount')) {
@@ -102,7 +104,7 @@ function Mint({ onMintSuccess }) {
             <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">작품 등록</h1>
                 <p className="text-slate-500 mb-6 text-sm">
-                    작품 정보를 입력하면 이미지와 메타데이터가 IPFS에 자동 업로드된 후
+                    작품 정보를 입력하면 이미지와 메타데이터가 함께 IPFS 폴더로 업로드된 후
                     10,000조각 NFT로 민팅됩니다.
                 </p>
 

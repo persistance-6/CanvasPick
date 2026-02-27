@@ -84,6 +84,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedArtworkId, setSelectedArtworkId] = useState(1);
   const [previousPage, setPreviousPage] = useState('gallery');
+  const [mintedArtId, setMintedArtId] = useState(null);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { isConnected, account, provider, connect, disconnect } = useWallet();
 
@@ -133,8 +134,16 @@ function AppContent() {
         {currentPage === 'home' && <Home onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'gallery' && <Gallery onArtworkSelect={handleNavigateToArtwork} />}
         {currentPage === 'detail' && <ArtworkDetail artworkId={selectedArtworkId} onBack={() => setCurrentPage(previousPage)} />}
-        {currentPage === 'mint' && <Mint onMintSuccess={() => setCurrentPage('mint-success')} />}
-        {currentPage === 'mint-success' && <MintSuccess onNavigateHome={() => setCurrentPage('home')} />}
+        {currentPage === 'mint' && (
+          <Mint onMintSuccess={(artId) => { setMintedArtId(artId); setCurrentPage('mint-success'); }} />
+        )}
+        {currentPage === 'mint-success' && (
+          <MintSuccess
+            mintedArtId={mintedArtId}
+            onViewArtwork={(id) => handleNavigateToArtwork(id)}
+            onNavigateHome={() => setCurrentPage('home')}
+          />
+        )}
         {currentPage === 'assets' && <MyAssets onArtworkSelect={handleNavigateToArtwork} />}
       </main>
     </div>

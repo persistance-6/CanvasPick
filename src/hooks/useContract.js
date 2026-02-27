@@ -47,6 +47,13 @@ export const useContract = () => {
     [provider]
   );
 
+  const getAllArtIds = useCallback(
+    async () => {
+      return contractService.getAllArtIds(provider);
+    },
+    [provider]
+  );
+
   return {
     getSharePrice,
     getUserPortfolio,
@@ -54,5 +61,6 @@ export const useContract = () => {
     buyArtworks,
     mintArt,
     getTokenURI,
+    getAllArtIds,
   };
 };

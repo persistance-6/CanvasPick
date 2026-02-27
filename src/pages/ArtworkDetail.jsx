@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useContract } from '../hooks/useContract';
 import { formatAddress, formatPrice, formatTokenAmount, formatPercentage, formatEth, ipfsToHttp } from '../utils/formatters';
+import { fetchMetadata } from '../utils/metadata';
 import { useEthPrice } from '../hooks/useEthPrice';
 import { CONTRACT_ADDRESS, TARGET_NETWORK } from '../constants/contract';
 import {
@@ -9,17 +10,6 @@ import {
   Users, Tag, Layers, BarChart3, Info, FileText, Shield,
   ChevronDown, ChevronUp, Copy, Check,
 } from 'lucide-react';
-
-/**
- * 토큰 URI에서 메타데이터 JSON을 가져온다.
- */
-async function fetchMetadata(uri) {
-  const url = ipfsToHttp(uri);
-  if (!url) return null;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`메타데이터 fetch 실패 (${res.status})`);
-  return res.json();
-}
 
 /** 접을 수 있는 섹션 컴포넌트 (OpenSea 스타일 아코디언) */
 function CollapsibleSection({ icon: Icon, title, defaultOpen = true, count, children }) {

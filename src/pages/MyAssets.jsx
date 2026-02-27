@@ -2,20 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { useContract } from '../hooks/useContract';
 import { formatTokenAmount, formatPercentage, formatPrice, ipfsToHttp } from '../utils/formatters';
+import { fetchMetadata } from '../utils/metadata';
 import { useEthPrice } from '../hooks/useEthPrice';
 import { Loader2, ImageOff, RefreshCw } from 'lucide-react';
-
-/**
- * 토큰 URI에서 메타데이터 JSON을 가져온다.
- * ipfs:// URI를 HTTP 게이트웨이로 변환하여 fetch한다.
- */
-async function fetchMetadata(uri) {
-  const url = ipfsToHttp(uri);
-  if (!url) return null;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`메타데이터 fetch 실패 (${res.status})`);
-  return res.json();
-}
 
 function MyAssets({ onArtworkSelect }) {
   const { isConnected, account } = useWallet();
