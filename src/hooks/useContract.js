@@ -12,6 +12,13 @@ export const useContract = () => {
     [provider]
   );
 
+  const getTotalShares = useCallback(
+    async () => {
+      return contractService.getTotalShares(provider);
+    },
+    [provider]
+  );
+
   const getUserPortfolio = useCallback(
     async (address) => {
       return contractService.getUserPortfolio(address, provider);
@@ -54,13 +61,22 @@ export const useContract = () => {
     [provider]
   );
 
+  const setWhitelist = useCallback(
+    async (address, status) => {
+      return contractService.setWhitelist(address, status, signer);
+    },
+    [signer]
+  );
+
   return {
     getSharePrice,
+    getTotalShares,
     getUserPortfolio,
     getAllHolders,
     buyArtworks,
     mintArt,
     getTokenURI,
     getAllArtIds,
+    setWhitelist,
   };
 };

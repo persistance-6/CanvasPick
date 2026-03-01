@@ -50,6 +50,15 @@ export const contractService = {
   },
 
   /**
+   * 작품당 총 조각 수 조회 (컨트랙트 상수)
+   */
+  async getTotalShares(provider) {
+    const contract = this.getReadOnlyContract(provider);
+    const totalShares = await contract.TOTAL_SHARES();
+    return totalShares;
+  },
+
+  /**
    * 사용자의 포트폴리오 조회
    */
   async getUserPortfolio(address, provider) {

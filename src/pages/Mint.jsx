@@ -214,7 +214,7 @@ function Mint({ onMintSuccess }) {
                             </div>
                             <div className="flex justify-between border-t border-slate-200 pt-2 mt-2">
                                 <span className="font-bold">총 시가</span>
-                                <span className="font-bold text-blue-600">
+                                          <span className="font-bold text-brand-gradient">
                                     {(parseFloat(price || 0) * 10000).toFixed(4)} ETH
                                 </span>
                             </div>
@@ -222,7 +222,7 @@ function Mint({ onMintSuccess }) {
 
                         {/* 진행 단계 표시 */}
                         {loading && step && (
-                            <div className="p-3 rounded-lg text-sm font-medium bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-2">
+                                     <div className="p-3 rounded-lg text-sm font-medium bg-gradient-to-r from-slate-50 to-slate-100 text-slate-800 border border-slate-200 flex items-center gap-2">
                                 <svg className="animate-spin w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />

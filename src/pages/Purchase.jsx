@@ -74,7 +74,7 @@ function Purchase() {
                 min="1"
                 value={artworkId}
                 onChange={(e) => setArtworkId(parseInt(e.target.value) || 1)}
-                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                 className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-primary"
               />
             </div>
 
@@ -86,7 +86,7 @@ function Purchase() {
                 max="10000"
                 value={quantity}
                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                 className="w-full p-3 bg-slate-100 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-primary"
               />
             </div>
 
@@ -97,14 +97,14 @@ function Purchase() {
               </div>
               <div className="border-t border-slate-200 pt-2 flex justify-between">
                 <span className="font-bold">총액</span>
-                <span className="font-bold text-blue-600">{formatPrice(totalPrice)}</span>
+                 <span className="font-bold text-brand-gradient">{formatPrice(totalPrice)}</span>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-lg transition-all shadow-md"
+                className="w-full btn-brand-gradient disabled:bg-slate-300 disabled:opacity-100 font-bold py-3 shadow-md"
             >
               {loading ? '처리 중...' : '구매하기'}
             </button>

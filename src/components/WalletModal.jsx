@@ -166,7 +166,7 @@ function WalletModal({ account, provider, onDisconnect, onClose }) {
                         <button
                             onClick={handleCopy}
                             title="주소 복사"
-                            className="flex-shrink-0 text-slate-400 hover:text-blue-500 transition-colors"
+                               className="flex-shrink-0 text-slate-400 hover:text-brand-gradient transition-colors"
                         >
                             {copied
                                 ? <CheckCheck className="w-4 h-4 text-green-500" />
